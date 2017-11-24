@@ -126,6 +126,8 @@ proc_data<-function(rslt, name){
     return (.jevalArray(s, silent=TRUE))
   else if (.jinstanceof(s, "java/lang/Number"))
     return (.jcall(s, "D", "doubleValue"))
+  else if (.jinstanceof(s, "ec/tstoolkit/information/StatisticalTest"))
+    return (test_jd2r(s))
   else
     return (.jcall(s, "S", "toString"))
 }
@@ -176,18 +178,15 @@ matrix_r2jd<-function(s){
   return (.jnew("ec/tstoolkit/maths/matrices/matrix", as.double(s), as.integer(sdim[1], as.integer(sdim[2])) ))
 }
 
-jd2_aggregate<-function(s, nfreq=1, conversion="Sum", complete=TRUE){
-  if (is.null(s)){
-    return (NULL)
-  }
-  jd_s<-ts_r2jd(s)
-  jd_agg<-.jcall("demetra/r/TsUtility", "Ldemetra/timeseries/simplets/TsData;", "aggregate", jd_s, 
-                 as.integer(nfreq), conversion, complete); 
-  if (is.null(jd_agg)){
-    return (NULL);
-  }
-  else{
-    return (ts_jd2r(jd_agg))
-  }
+test_jd2r<-function(s){
+  if (is.null(s))
+    return(NULL)
+  desc<-.jfield(s, "S", "description")
+  val<-.jfield(s, "D", "value")
+  pval<-.jfield(s, "D", "pvalue")
+  all<-c(val, pval)
+  attr(all, "description")<-desc
+  return (all)
 }
+
 
