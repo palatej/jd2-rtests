@@ -118,16 +118,31 @@ proc_data<-function(rslt, name){
   s<-.jcall(rslt, "Ljava/lang/Object;", "getData", name, jd_clobj)
   if (is.null(s))
     return (NULL)
-  if (.jinstanceof(s, "ec.tstoolkit/timeseries/simplets/TsData"))
-    return(ts_jd2r(.jcast(s,"ec.tstoolkit/timeseries/simplets/TsData")))
-  else if (.jinstanceof(s, "ec.tstoolkit/maths/matrices/Matrix"))
-    return(matrix_jd2r(.jcast(s,"ec.tstoolkit/maths/matrices/Matrix")))
-  else if (.jinstanceof(s, "java/lang/reflect/Array"))
+  if (.jinstanceof(s, "ec.tstoolkit.timeseries.simplets.TsData"))
+    return(ts_jd2r(.jcast(s,"ec.tstoolkit.timeseries.simplets.TsData")))
+  else if (.jinstanceof(s, "ec.tstoolkit.maths.matrices.Matrix"))
+    return(matrix_jd2r(.jcast(s,"ec.tstoolkit.maths.matrices.Matrix")))
+  else if (.jinstanceof(s, "ec.tstoolkit.information.StatisticalTest"))
+    return (test_jd2r(s))
+  else if (.jinstanceof(s, "ec.tstoolkit.Parameter")){
+    val<-.jcall(s, "D", "getValue")
+    e<-.jcall(s, "D", "getStde")
+    return (c(val, e))
+  }
+  else if (.jinstanceof(s, "[Lec.tstoolkit.Parameter;")){
+    p<-.jcastToArray(s)
+    len<-length(p)
+    all<-array(0, dim=c(len,2))
+    for (i in 1:len){
+      all[i, 1]<-.jcall(p[[i]], "D", "getValue")
+      all[i, 2]<-.jcall(p[[i]], "D", "getStde")
+    }
+    return (all)
+  }
+  else if (.jcall(.jcall(s, "Ljava/lang/Class;", "getClass"), "Z", "isArray"))
     return (.jevalArray(s, silent=TRUE))
   else if (.jinstanceof(s, "java/lang/Number"))
     return (.jcall(s, "D", "doubleValue"))
-  else if (.jinstanceof(s, "ec/tstoolkit/information/StatisticalTest"))
-    return (test_jd2r(s))
   else
     return (.jcall(s, "S", "toString"))
 }
