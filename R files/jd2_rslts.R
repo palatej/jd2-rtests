@@ -87,10 +87,18 @@ proc_parameters<-function(rslt, name){
     return(NULL)
   p<-.jcastToArray(jd_p)
   len<-length(p)
-  all<-array(0, dim=c(len,2))
+  all<-array(0, dim=c(len,3))
   for (i in 1:len){
-    all[i, 1]<-.jcall(p[[i]], "D", "getValue")
-    all[i, 2]<-.jcall(p[[i]], "D", "getStde")
+    n<-.jcall("ec/tstoolkit/Parameter", "Z", "isDefault", .jcast(p[[i]], "ec/tstoolkit/Parameter"))
+    if (n){
+      all[i, 1]<-NaN
+      all[i, 2]<-0
+      all[i, 3]<-FALSE
+    }else{
+      all[i, 1]<-.jcall(p[[i]], "D", "getValue")
+      all[i, 2]<-.jcall(p[[i]], "D", "getStde")
+      all[i, 3]<-.jcall(p[[i]], "Z", "isFixed")
+    }
   }
   return (all)
 }
@@ -204,4 +212,30 @@ test_jd2r<-function(s){
   return (all)
 }
 
+parameters_r2jd<-function(params, fixed=NULL){
+  if (is.null(fixed))
+    return(.jcall("jdr/spec/ts/Utility", "[Lec/tstoolkit/Parameter;", "parameters", .jarray(params), evalArray = FALSE))
+  else
+    return(.jcall("jdr/spec/ts/Utility", "[Lec/tstoolkit/Parameter;", "parameters", .jarray(params), .jarray(fixed), evalArray = FALSE))
+}
 
+parameters_jd2r<-function(jparams){
+  if (is.jnull(jparams))
+    return(NULL)
+  p<-.jcastToArray(jparams)
+  len<-length(p)
+  all<-array(0, dim=c(len,3))
+  for (i in 1:len){
+    n<-.jcall("ec/tstoolkit/Parameter", "Z", "isDefault", .jcast(p[[i]], "ec/tstoolkit/Parameter"))
+    if (n){
+      all[i, 1]<-NaN
+      all[i, 2]<-0
+      all[i, 3]<-FALSE
+    }else{
+      all[i, 1]<-.jcall(p[[i]], "D", "getValue")
+      all[i, 2]<-.jcall(p[[i]], "D", "getStde")
+      all[i, 3]<-.jcall(p[[i]], "Z", "isFixed")
+    }
+  }
+  return (all)
+}
