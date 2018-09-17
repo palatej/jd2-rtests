@@ -13,11 +13,11 @@ plot(d10[cycle(d10)==1])
 
 show(a)
 
-qb3<-jd2_CombinedSeasonality(result(a, "decomposition.b3"), TRUE)
-show(result(qb3, "stable"))
+#qb3<-jd2_CombinedSeasonality(result(a, "decomposition.b3"), TRUE)
+#show(result(qb3, "stable"))
 
-qd8<-jd2_CombinedSeasonality(result(a, "decomposition.d8"), TRUE)
-show(result(qd8, "stable"))
-show(result(qd8, "evolutive"))
+#qd8<-jd2_CombinedSeasonality(result(a, "decomposition.d8"), TRUE)
+#show(result(qd8, "stable"))
+#show(result(qd8, "evolutive"))
 
 
